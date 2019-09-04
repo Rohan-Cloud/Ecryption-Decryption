@@ -1,0 +1,142 @@
+1> create student table.
+
+2> create user exception on that in pl/sql to show exception for the nagative mark.
+
+3> create trigger which shows avg and grade of the student.
+
+4> write a procudecure that displays details of topper.
+if there are more then 1 topper store pl/sql.
+
+5> write a function that accepts roll num of students and returns grade of the students
+
+6> write a store proc that displays grade wise number of students
+-----------------------
+
+create table student (
+r_no number(3) primary key,
+name varchar2(20) not null,
+m1 number (3) not null,
+m2 number(3) not null,
+m3 number(3) not null
+);
+
+--------------------------
+
+alter table student add(
+total number(5),
+avg number(5),
+grade varchar2(3)
+) ;
+
+--------------------------
+
+create sequence roll_seq
+start with 101
+increment by 1;
+
+-------------------------------
+--raise user Exception:-
+
+declare
+	nag_marks exception;
+	
+	v_name student.name%type;
+	v_m1 student.m1%type;
+	v_m2 student.m2%type;
+	v_m3 student.m3%type;
+	
+	begin
+	-- store the value of r_no into v_id;
+	v_name:='&name';
+	v_m1 := &marks1;
+	v_m2:= &marks2 ;
+	v_m3:= &marks3;
+	-- read the id ,m1,m2,m3 from table and compare it with the given one.
+
+
+	
+		if v_m1 <0 or v_m2 <0 or v_m3 <0 then
+			raise nag_marks;
+		else
+		
+			insert into student (name,m1,m2,m3) values (v_name,v_m1,v_m2,v_m3);
+
+
+		end if;
+
+		exception 
+		when nag_marks then
+				dbms_output.put_line('Nagative marks are not allowed to enter.');
+				
+				
+	end;
+
+----------------------------------------------------------	
+
+create or replace trigger count_marks
+before insert 
+on student
+for each row
+declare
+-- v_id student.r_no%type;
+v_total student.total%type;
+v_avg student.avg%type; 
+v_grade student.grade%type;
+ begin
+  	select roll_seq.nextval into :new.r_no from dual;
+	v_total := ( :new.m1 + :new.m2 + :new.m3 );
+	v_avg := v_total / 3;
+
+	if  v_avg >90 then
+		v_grade := 'AA';	
+	elsif v_avg >80  and v_avg <70 then
+		v_grade := 'A';
+	elsif v_avg >70 and v_avg <60 then
+		v_grade := 'BB';
+	elsif v_avg >60  and v_avg <50 then
+		v_grade := 'B';
+	else 
+		v_grade := 'IF';
+
+	end if;
+	:new.total := v_total;
+	:new.avg := v_avg;
+	:new.grade := v_grade;
+	-- raise_application_error(-20003,'Cannt be updated.');
+	 
+end;
+
+----------------------------------------------------------------------
+create or replace procedure get_rank
+as
+cursor cs1 is select name from student where total=(select max(total) from student);
+
+begin
+	for s in cs1
+	loop
+ 		dbms_output.put_line('name' || s.name);
+	end loop;
+end;   
+-----------------------------------------------------------------------------
+
+--write pl/sql function that accepts roll no of student and returns grade of student
+
+create or replace function get_grade
+(v_no student.r_no%type) return varchar as 
+v_grade student.grade%type;
+
+begin
+	select grade into v_grade from student where r_no=v_no;
+	return (v_grade);
+end; 
+
+-------------------------------------------------------
+--show grade
+
+declare
+	v_grade student.grade%type;
+begin
+	v_grade:=get_grade(&r_no);
+ 	dbms_output.put_line('Grade:- ' || v_grade);
+end;
+
