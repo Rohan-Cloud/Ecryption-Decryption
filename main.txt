@@ -1,0 +1,75 @@
+ROLL NO                  :   16MCA023
+NAME                      :   Kapil Kaklotar p
+COURSE CODE       :   3ca1252
+COURSE NAME     :    Dbms
+PRACTICAL NO      :   05
+
+AIM :  Create the table And Solve the query .
+
+Methedology :
+
+1)
+create table teaches1
+( id varchar(10),
+course_id varchar(10),
+sec_id varchar(10),
+semester varchar(10),
+year varchar(10),
+primary key(id,course_id,sec_id,semester,year));
+
+2)
+Drop table advisor;
+
+3) 
+create table advisor1
+( s_id varchar(10) primary key,
+  i_id varchar(10) references instructor1(id),
+foreign key(s_id) references student1(id));
+
+
+4)
+select s_id
+from advisor
+group by s_id
+having count(i_id) > 3;
+
+5)
+Select s_id
+From (select s_id from advisor where id in(select * from instructor where name=”kapil”)) natural jon
+(select s_id from advisor where id(select * from instructor where name=”kapil”));
+
+6)
+Select s_id S_ddeptname As student,i_deptname As Ins_dept
+From student S,Instructor I,Advisor A
+Where s_id=a.S_id AND i_id = a.I_id  AND i_dept_name <> s.dept_name;
+
+7)
+Select *
+From section
+Where to_char(sysdate.’yyyy’) year>10;
+
+8)
+	1)
+		Delete from course where title=”cs”;
+	2)
+		Alter table prereq drop constraint prereq_id;
+	3)	
+Alter table prereq add constraint prereq_id foreign key (prereq_id) references course(course_id) on cascade;
+             4)
+		Delet from course where title=”cs”;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
